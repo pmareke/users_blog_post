@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from uuid import UUID
 
 from src.domain.users.user import User
 
@@ -10,5 +9,5 @@ class UsersRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    def get(self, id: UUID) -> User:
+    def get(self, id: str) -> User:
         raise NotImplementedError

@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -15,6 +13,6 @@ class PostgresUsersRepository(UsersRepository):
         self.session.add(user)
         self.session.commit()
 
-    def get(self, id: UUID) -> User:
+    def get(self, id: str) -> User:
         stmt = select(User).where(User.user_id == id)
         return self.session.execute(stmt).scalar_one()
