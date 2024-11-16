@@ -12,7 +12,7 @@ from src.infrastructure.postgres.postgres_users_repository import (
 
 
 class TestPostgresUsersRepository:
-    def test_create_user(self) -> None:
+    def test_create_and_get_user(self) -> None:
         engine = create_engine(f"postgresql://{settings.db_dsn}")
         session = Session(engine)
         user_id = uuid4().hex

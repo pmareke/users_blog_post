@@ -11,7 +11,7 @@ from src.common.settings import settings
 from src.delivery.api.v1.users.users_router import users_router
 
 
-def run_sql_migrations():
+def run_sql_migrations() -> None:
     logger.info("Running SQL migrations...")
 
     alembic_cfg = Config("alembic.ini")
