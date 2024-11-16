@@ -57,7 +57,8 @@ def _create(
     user = User(user_id=user_id, name=name, age=age)
     command = CreateUserCommand(user)
     response = handler.execute(command)
-    return CreatedUserResponse(id=response.user_id)
+    user_id = response.message()
+    return CreatedUserResponse(id=user_id)
 
 
 @users_router.get("/users/{id}", response_model=UserResponse)

@@ -64,7 +64,7 @@ test-acceptance: ## Run acceptance tests
 	docker compose run --build --rm --entrypoint /code/scripts/test-entrypoint.sh server poetry run pytest tests/acceptance -ra
 
 .PHONY: test
-test: test-unit test-integration ## Run all the tests
+test: test-unit test-integration test-acceptance ## Run all the tests
 
 .PHONY: migration
 migration: ## Generate a new migration, ex: make migration name=XXX
