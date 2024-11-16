@@ -1,7 +1,7 @@
-from http.client import CREATED
+from http.client import CREATED, INTERNAL_SERVER_ERROR, NOT_FOUND
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
@@ -10,6 +10,11 @@ from src.delivery.api.v1.users.created_user_response import CreatedUserResponse
 from src.delivery.api.v1.users.user_request import UserRequest
 from src.delivery.api.v1.users.user_response import UserResponse
 from src.domain.command import CommandHandler
+from src.domain.exceptions import (
+    CreateUserCommandException,
+    GetUserQueryException,
+    NotFoundGetUserQueryException,
+)
 from src.domain.query import QueryHandler
 from src.domain.users.user import User
 from src.domain.users.users_repository import UsersRepository
@@ -56,9 +61,14 @@ def _create(
     age = user_request.age
     user = User(user_id=user_id, name=name, age=age)
     command = CreateUserCommand(user)
-    response = handler.execute(command)
-    user_id = response.message()
-    return CreatedUserResponse(id=user_id)
+    try:
+        response = handler.execute(command)
+        user_id = response.message()
+        return CreatedUserResponse(id=user_id)
+    except CreateUserCommandException:
+        raise HTTPException(
+            status_code=INTERNAL_SERVER_ERROR, detail="Sorry for the noise!"
+        )
 
 
 @users_router.get("/users/{id}", response_model=UserResponse)
@@ -66,6 +76,13 @@ def _get(
     id: str, handler: QueryHandler = Depends(_get_user_query_handler)
 ) -> UserResponse:
     command = GetUserQuery(id)
-    response = handler.execute(command)
-    user: User = response.message()
-    return UserResponse(id=user.user_id, name=user.name, age=user.age)
+    try:
+        response = handler.execute(command)
+        user: User = response.message()
+        return UserResponse(id=user.user_id, name=user.name, age=user.age)
+    except NotFoundGetUserQueryException:
+        raise HTTPException(status_code=NOT_FOUND, detail=f"Item '{id}' not found")
+    except GetUserQueryException:
+        raise HTTPException(
+            status_code=INTERNAL_SERVER_ERROR, detail="Sorry for the noise!"
+        )

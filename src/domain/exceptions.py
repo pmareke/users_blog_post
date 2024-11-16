@@ -12,3 +12,7 @@ class CreateUserCommandException(Exception):
 
 class GetUserQueryException(Exception):
     pass
+
+
+class NotFoundGetUserQueryException(Exception):
+    pass

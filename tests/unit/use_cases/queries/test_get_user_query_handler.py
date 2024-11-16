@@ -5,6 +5,7 @@ from expects import expect, raise_error
 
 from src.domain.exceptions import (
     GetUserQueryException,
+    NotFoundGetUserQueryException,
     NotFoundUsersRepositoryException,
     UsersRepositoryException,
 )
@@ -47,4 +48,6 @@ class TestGetUserQueryHandler:
         command = GetUserQuery(user_id)
         handler = GetUserQueryHandler(repository)
 
-        expect(lambda: handler.execute(command)).to(raise_error(GetUserQueryException))
+        expect(lambda: handler.execute(command)).to(
+            raise_error(NotFoundGetUserQueryException)
+        )

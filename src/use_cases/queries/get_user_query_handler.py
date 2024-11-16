@@ -1,5 +1,6 @@
 from src.domain.exceptions import (
     GetUserQueryException,
+    NotFoundGetUserQueryException,
     NotFoundUsersRepositoryException,
     UsersRepositoryException,
 )
@@ -29,5 +30,7 @@ class GetUserQueryHandler(QueryHandler):
         try:
             user = self.repository.get(query.user_id)
             return GetUserQueryResponse(user)
-        except (UsersRepositoryException, NotFoundUsersRepositoryException) as ex:
+        except UsersRepositoryException as ex:
             raise GetUserQueryException from ex
+        except NotFoundUsersRepositoryException as ex:
+            raise NotFoundGetUserQueryException from ex
