@@ -1,4 +1,5 @@
 from src.domain.command import Command, CommandHandler
+from src.domain.exceptions import CreateUserCommandException, UsersRepositoryException
 from src.domain.users.user import User
 from src.domain.users.users_repository import UsersRepository
 
@@ -22,5 +23,8 @@ class CreateUserCommandHandler(CommandHandler):
         self.repository = repository
 
     def execute(self, command: CreateUserCommand) -> CreateUserCommandResponse:
-        self.repository.save(command.user)
-        return CreateUserCommandResponse(user_id=command.user.user_id)
+        try:
+            self.repository.save(command.user)
+            return CreateUserCommandResponse(user_id=command.user.user_id)
+        except UsersRepositoryException as ex:
+            raise CreateUserCommandException from ex

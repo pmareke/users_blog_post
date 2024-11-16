@@ -1,3 +1,8 @@
+from src.domain.exceptions import (
+    GetUserQueryException,
+    NotFoundUsersRepositoryException,
+    UsersRepositoryException,
+)
 from src.domain.query import Query, QueryHandler
 from src.domain.users.user import User
 from src.domain.users.users_repository import UsersRepository
@@ -21,5 +26,8 @@ class GetUserQueryHandler(QueryHandler):
         self.repository = repository
 
     def execute(self, query: GetUserQuery) -> GetUserQueryResponse:
-        user = self.repository.get(query.user_id)
-        return GetUserQueryResponse(user)
+        try:
+            user = self.repository.get(query.user_id)
+            return GetUserQueryResponse(user)
+        except (UsersRepositoryException, NotFoundUsersRepositoryException) as ex:
+            raise GetUserQueryException from ex

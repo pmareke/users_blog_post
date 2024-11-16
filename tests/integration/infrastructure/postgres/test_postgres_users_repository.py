@@ -1,10 +1,12 @@
 from uuid import uuid4
 
-from expects import equal, expect
+import pytest
+from expects import equal, expect, raise_error
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 
 from src.common.settings import settings
+from src.domain.exceptions import NotFoundUsersRepositoryException
 from src.domain.users.user import User
 from src.infrastructure.postgres.postgres_users_repository import (
     PostgresUsersRepository,
@@ -12,9 +14,12 @@ from src.infrastructure.postgres.postgres_users_repository import (
 
 
 class TestPostgresUsersRepository:
-    def test_create_and_get_user(self) -> None:
+    @pytest.fixture
+    def session(self) -> Session:
         engine = create_engine(f"postgresql://{settings.db_dsn}")
-        session = Session(engine)
+        return Session(engine)
+
+    def test_create_and_get_user(self, session: Session) -> None:
         user_id = uuid4().hex
         user = User(user_id=user_id, name="test", age=18)
         users_repository = PostgresUsersRepository(session)
@@ -23,3 +28,10 @@ class TestPostgresUsersRepository:
         found_user = users_repository.get(user_id)
 
         expect(found_user).to(equal(user))
+
+    def test_raise_not_found_exceptions(self, session: Session) -> None:
+        users_repository = PostgresUsersRepository(session)
+
+        expect(lambda: users_repository.get("not_found")).to(
+            raise_error(NotFoundUsersRepositoryException)
+        )

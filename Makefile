@@ -53,7 +53,7 @@ format:  ## Format python code
 
 .PHONY: test-unit
 test-unit: ## Run unit tests
-	poetry run pytest -n auto tests/unit -ra
+	poetry run pytest tests/unit -ra
 
 .PHONY: test-integration
 test-integration: ## Run integration tests
