@@ -1,0 +1,27 @@
+services:
+  server:
+    build: .
+    environment:
+      DB_DSN: "postgres:postgres@postgres/users"
+      DB_HOST: "postgres"
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-q" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
